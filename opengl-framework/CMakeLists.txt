@@ -10,7 +10,7 @@ set(WARNINGS_AS_ERRORS_FOR_OPENGL_FRAMEWORK OFF CACHE BOOL "ON iff you want to t
 if(MSVC)
     target_compile_options(opengl_framework PRIVATE /W4)
 else()
-    target_compile_options(opengl_framework PRIVATE -Wall -Wextra -Wpedantic -pedantic-errors -Wconversion -Wsign-conversion)
+    target_compile_options(opengl_framework PRIVATE -Wall -Wextra -Wpedantic -pedantic-errors -Wconversion -Wsign-conversion -Wimplicit-fallthrough)
 endif()
 
 # Maybe enable warnings as errors
