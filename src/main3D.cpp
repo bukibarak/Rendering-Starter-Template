@@ -97,7 +97,7 @@ void main() {
         glm::mat4 const projection_matrix = glm::infinitePerspective(
             glm::radians(90.f),
             gl::framebuffer_aspect_ratio() /*aspect ratio*/,
-            0.000001f /*near plane*/
+            0.0001f /*near plane*/
         );
         glm::mat4 const ortho_matrix = glm::ortho(-2.0f, +2.0f, -1.5f, +1.5f, 0.1f, 100.0f);
 
@@ -122,7 +122,7 @@ void main() {
         glClearColor(0.f, 0.f, 1.f, 1.f);
 
         // Clear previous frame buffers
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         screen_shader.bind();
         screen_shader.set_uniform("view_projection_matrix", view_projection_matrix);
