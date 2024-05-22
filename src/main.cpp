@@ -26,5 +26,11 @@ int main()
 
         // Exécute concrètement l'action d'appliquer sur tout l'écran la couleur choisie au-dessus
         glClear(GL_COLOR_BUFFER_BIT);
+
+        // On a besoin qu'un shader soit bind (i.e. "actif") avant de draw(). On en reparle dans la section d'après.
+        gl::bind_default_shader();
+
+        // C'est ce qu'on appelle un "draw call" : on envoie l'instruction à la carte graphique de dessiner notre mesh.
+        triangle_mesh.draw();
     }
 }
