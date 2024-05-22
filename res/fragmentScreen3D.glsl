@@ -7,5 +7,7 @@ out vec4 out_color;
 
 void main()
 {
-    out_color = texture(tex, uv);
+    vec4 tex_color =  texture(tex, uv);
+    float nb_color = (tex_color.x + tex_color.y + tex_color.z) / 3.f;
+    out_color = vec4(vec3(nb_color), 1.f);
 }

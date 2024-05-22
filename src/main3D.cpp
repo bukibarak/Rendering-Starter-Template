@@ -38,6 +38,7 @@ void main() {
             },
         },
     }};
+
     auto const texture = gl::Texture{
         gl::TextureSource::File{ // Peut être un fichier, ou directement un tableau de pixels
             .path           = "res/texture.png",
@@ -171,13 +172,15 @@ void main() {
 
         glm::mat4 const view_projection_matrix =  projection_matrix * view_matrix * model_matrix;
 
-        camera_shader.bind();
-        camera_shader.set_uniform("view_projection_matrix", view_projection_matrix);
-        camera_shader.set_uniform("tex", texture);
+
 
 
 
         render_target.render([&] {
+            camera_shader.bind();
+            camera_shader.set_uniform("view_projection_matrix", view_projection_matrix);
+            camera_shader.set_uniform("tex", texture);
+
             // Choisis la couleur à utiliser. Les paramètres sont R, G, B, A avec des valeurs qui vont de 0 à 1
             glClearColor(0.f, 0.f, 1.f, 1.f);
 
@@ -186,6 +189,9 @@ void main() {
 
             cube_mesh.draw();
         });
+
+        // Clear previous frame buffers
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         screen_shader.bind();
         screen_shader.set_uniform("tex", render_target.color_texture(0)); // TODO DEMANDER SI C'EST JUSTE
