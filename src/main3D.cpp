@@ -24,61 +24,63 @@ void main() {
         },
     });
 
-    auto const rectangle_mesh = gl::Mesh{{
-        .vertex_buffers = {{
-            .layout = {
-                gl::VertexAttribute::Position2D{0},
-                gl::VertexAttribute::UV{1}
-            },
-            .data   = {
-                -0.5f,  0.5f, 0.f, 0.f, // Top left
-                 0.5f,  0.5f, 0.f, 1.f, // Top right
-                 0.5f, -0.5f, 1.f, 1.f, // Bottom right
-                -0.5f, -0.5f, 1.f, 0.f, // Bottom left
-            },
-        }},
-        .index_buffer = {
-            0, 1, 2,
-            0, 2, 3
-        }
-    }};
+    // auto const rectangle_mesh = gl::Mesh{{
+    //     .vertex_buffers = {{
+    //         .layout = {
+    //             gl::VertexAttribute::Position2D{0},
+    //             gl::VertexAttribute::UV{1}
+    //         },
+    //         .data   = {
+    //             -0.5f,  0.5f, 0.f, 0.f, // Top left
+    //              0.5f,  0.5f, 0.f, 1.f, // Top right
+    //              0.5f, -0.5f, 1.f, 1.f, // Bottom right
+    //             -0.5f, -0.5f, 1.f, 0.f, // Bottom left
+    //         },
+    //     }},
+    //     .index_buffer = {
+    //         0, 1, 2,
+    //         0, 2, 3
+    //     }
+    // }};
 
-    // auto const cube_mesh = gl::Mesh{
-    //     {
-    //         .vertex_buffers = {
-    //             {
-    //                 .layout = {gl::VertexAttribute::Position3D{0}},
-    //                 .data = {
-    //                     -1.f,  1.f,  1.f,
-    //                      1.f,  1.f,  1.f,
-    //                     -1.f, -1.f,  1.f,
-    //                      1.f, -1.f,  1.f,
-    //                     -1.f,  1.f, -1.f,
-    //                      1.f,  1.f, -1.f,
-    //                     -1.f, -1.f, -1.f,
-    //                      1.f, -1.f, -1.f,
-    //                 },
-    //             }},
-    //         .index_buffer = {
-    //             0, 1, 2,
-    //             1, 3, 2,
-    //
-    //             4, 5, 6,
-    //             5, 7, 6,
-    //
-    //             4, 0, 6,
-    //             0, 2, 6,
-    //
-    //             1, 5, 3,
-    //             5, 7, 3,
-    //
-    //             4, 5, 1,
-    //             4, 1, 0,
-    //
-    //             6, 7, 3,
-    //             6, 3, 2,
-    //         }
-    //     }};
+
+
+    auto const cube_mesh = gl::Mesh{
+        {
+            .vertex_buffers = {
+                {
+                    .layout = {gl::VertexAttribute::Position3D{0}},
+                    .data = {
+                        -1.f,  1.f,  1.f,
+                         1.f,  1.f,  1.f,
+                        -1.f, -1.f,  1.f,
+                         1.f, -1.f,  1.f,
+                        -1.f,  1.f, -1.f,
+                         1.f,  1.f, -1.f,
+                        -1.f, -1.f, -1.f,
+                         1.f, -1.f, -1.f,
+                    },
+                }},
+            .index_buffer = {
+                0, 1, 2,
+                1, 3, 2,
+
+                4, 5, 6,
+                5, 7, 6,
+
+                4, 0, 6,
+                0, 2, 6,
+
+                1, 5, 3,
+                5, 7, 3,
+
+                4, 5, 1,
+                4, 1, 0,
+
+                6, 7, 3,
+                6, 3, 2,
+            }
+        }};
 
     auto const screen_shader = gl::Shader{{
         .vertex = gl::ShaderSource::File{"res/vertex3D.glsl"},
@@ -107,8 +109,7 @@ void main() {
         glm::mat4 const translation_matrix = glm::translate(
             glm::mat4{1.f},
             // glm::vec3{0.5f * sin(gl::time_in_seconds()), 0.f, -0.2f} /* déplacement */
-            // glm::vec3{-2.f, 0.f, -1.f}
-            glm::vec3{0.f, 0.f, 0.f}
+            glm::vec3{-2.f, 0.f, -1.f}
         );
         glm::mat4 const rotation_matrix = glm::rotate(
             glm::mat4{1.f},
@@ -130,7 +131,7 @@ void main() {
 
         screen_shader.bind();
         screen_shader.set_uniform("view_projection_matrix", view_projection_matrix);
-        rectangle_mesh.draw();
+        cube_mesh.draw();
 
     }
 }

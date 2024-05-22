@@ -1,8 +1,8 @@
 #version 410
 
+in vec2 vertex_position;
+in vec2 uv;
 
-
-in vec3 vertex_position;
 out vec4 out_color;
 
 
