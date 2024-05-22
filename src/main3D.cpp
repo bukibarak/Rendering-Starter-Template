@@ -13,6 +13,32 @@ void main() {
     gl::init("OpenGL 3D");
     gl::maximize_window();
 
+    // Render target initialization
+    auto render_target = gl::RenderTarget{gl::RenderTarget_Descriptor{
+        .width          = gl::framebuffer_width_in_pixels(),
+        .height         = gl::framebuffer_height_in_pixels(),
+        .color_textures = {
+            gl::ColorAttachment_Descriptor{
+                .format  = gl::InternalFormat_Color::RGBA8,
+                .options = {
+                    .minification_filter  = gl::Filter::NearestNeighbour, // On va toujours afficher la texture à la taille de l'écran,
+                    .magnification_filter = gl::Filter::NearestNeighbour, // donc les filtres n'auront pas d'effet. Tant qu'à faire on choisit le moins coûteux.
+                    .wrap_x               = gl::Wrap::ClampToEdge,
+                    .wrap_y               = gl::Wrap::ClampToEdge,
+                },
+            },
+        },
+        .depth_stencil_texture = gl::DepthStencilAttachment_Descriptor{
+            .format  = gl::InternalFormat_DepthStencil::Depth32F,
+            .options = {
+                .minification_filter  = gl::Filter::NearestNeighbour,
+                .magnification_filter = gl::Filter::NearestNeighbour,
+                .wrap_x               = gl::Wrap::ClampToEdge,
+                .wrap_y               = gl::Wrap::ClampToEdge,
+            },
+        },
+    }};
+
     // Camera initialization
     auto camera = gl::Camera{};
     gl::set_events_callbacks({
@@ -20,6 +46,9 @@ void main() {
         {
             .on_mouse_pressed = [&](gl::MousePressedEvent const& e) {
                 std::cout << "Mouse pressed at " << e.position.x << " " << e.position.y << '\n';
+            },
+            .on_framebuffer_resized = [&](gl::FramebufferResizedEvent const& e) {
+                render_target.resize(e.width_in_pixels, e.height_in_pixels);
             },
         },
     });
@@ -49,16 +78,18 @@ void main() {
         {
             .vertex_buffers = {
                 {
-                    .layout = {gl::VertexAttribute::Position3D{0}},
+                    .layout = {
+                        gl::VertexAttribute::Position3D{0},
+                        gl::VertexAttribute::UV{1}},
                     .data = {
-                        -1.f,  1.f,  1.f,
-                         1.f,  1.f,  1.f,
-                        -1.f, -1.f,  1.f,
-                         1.f, -1.f,  1.f,
-                        -1.f,  1.f, -1.f,
-                         1.f,  1.f, -1.f,
-                        -1.f, -1.f, -1.f,
-                         1.f, -1.f, -1.f,
+                        -1.f,  1.f,  1.f, 0.f, 0.f,
+                         1.f,  1.f,  1.f, 0.f, 1.f,
+                        -1.f, -1.f,  1.f, 1.f, 0.f,
+                         1.f, -1.f,  1.f, 1.f, 1.f,
+                        -1.f,  1.f, -1.f, 0.f, 0.f,
+                         1.f,  1.f, -1.f, 0.f, 1.f,
+                        -1.f, -1.f, -1.f, 1.f, 0.f,
+                         1.f, -1.f, -1.f, 1.f, 1.f,
                     },
                 }},
             .index_buffer = {
@@ -81,6 +112,21 @@ void main() {
                 6, 3, 2,
             }
         }};
+
+    auto const texture = gl::Texture{
+        gl::TextureSource::File{ // Peut être un fichier, ou directement un tableau de pixels
+            .path           = "res/texture.png",
+            .flip_y         = true, // Il n'y a pas de convention universelle sur la direction de l'axe Y. Les fichiers (.png, .jpeg) utilisent souvent une direction différente de celle attendue par OpenGL. Ce booléen flip_y est là pour inverser la texture si jamais elle n'apparaît pas dans le bon sens.
+            .texture_format = gl::InternalFormat::RGBA8, // Format dans lequel la texture sera stockée. On pourrait par exemple utiliser RGBA16 si on voulait 16 bits par canal de couleur au lieu de 8. (Mais ça ne sert à rien dans notre cas car notre fichier ne contient que 8 bits par canal, donc on ne gagnerait pas de précision). On pourrait aussi stocker en RGB8 si on ne voulait pas de canal alpha. On utilise aussi parfois des textures avec un seul canal (R8) pour des usages spécifiques.
+        },
+        gl::TextureOptions{
+            .minification_filter  = gl::Filter::Linear, // Comment on va moyenner les pixels quand on voit l'image de loin ?
+            .magnification_filter = gl::Filter::Linear, // Comment on va interpoler entre les pixels quand on zoom dans l'image ?
+            .wrap_x               = gl::Wrap::Repeat,   // Quelle couleur va-t-on lire si jamais on essaye de lire en dehors de la texture ?
+            .wrap_y               = gl::Wrap::Repeat,   // Idem, mais sur l'axe Y. En général on met le même wrap mode sur les deux axes.
+        }
+    };
+
 
     auto const screen_shader = gl::Shader{{
         .vertex = gl::ShaderSource::File{"res/vertex3D.glsl"},
@@ -122,16 +168,22 @@ void main() {
 
         glm::mat4 const view_projection_matrix =  projection_matrix * view_matrix * model_matrix;
 
-
-        // Choisis la couleur à utiliser. Les paramètres sont R, G, B, A avec des valeurs qui vont de 0 à 1
-        glClearColor(0.f, 0.f, 1.f, 1.f);
-
-        // Clear previous frame buffers
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
         screen_shader.bind();
         screen_shader.set_uniform("view_projection_matrix", view_projection_matrix);
-        cube_mesh.draw();
+        screen_shader.set_uniform("tex", texture);
+
+
+
+        render_target.render([&] {
+            // Choisis la couleur à utiliser. Les paramètres sont R, G, B, A avec des valeurs qui vont de 0 à 1
+            glClearColor(0.f, 0.f, 1.f, 1.f);
+
+            // Clear previous frame buffers
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+            cube_mesh.draw();
+        });
+
 
     }
 }
