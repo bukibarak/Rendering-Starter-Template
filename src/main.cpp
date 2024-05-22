@@ -42,14 +42,22 @@ int main()
     {
         // Rendu à chaque frame
 
+        // Clear previous frame buffers
+        // glClear(GL_COLOR_BUFFER_BIT);
+        // glClear(GL_DEPTH_BUFFER_BIT);
+        // glClear(GL_STENCIL_BUFFER_BIT);
+
         // Choisis la couleur à utiliser. Les paramètres sont R, G, B, A avec des valeurs qui vont de 0 à 1
         glClearColor(0.f, 0.f, 1.f, 1.f);
 
         // Exécute concrètement l'action d'appliquer sur tout l'écran la couleur choisie au-dessus
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // On a besoin qu'un shader soit bind (i.e. "actif") avant de draw(). On en reparle dans la section d'après.
+        // Bind shader with screen
         rect_shader.bind();
+
+        // Set vertex shader uniform variables
+        rect_shader.set_uniform("aspect_ratio", gl::framebuffer_aspect_ratio());
 
         // C'est ce qu'on appelle un "draw call" : on envoie l'instruction à la carte graphique de dessiner notre mesh.
         rectangle_mesh.draw();
