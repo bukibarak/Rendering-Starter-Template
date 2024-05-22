@@ -48,8 +48,9 @@ void main() {
     // Update function
     while (gl::window_is_open()) {
         glm::mat4 const view_matrix = camera.view_matrix();
-        glm::mat4 const projection_matrix = glm::infinitePerspective(glm::radians(90.f), gl::framebuffer_aspect_ratio() /*aspect ratio*/, 0.000001f /*near plane*/);
-        glm::mat4 const view_projection_matrix =  projection_matrix * view_matrix;
+        // glm::mat4 const projection_matrix = glm::infinitePerspective(glm::radians(90.f), gl::framebuffer_aspect_ratio() /*aspect ratio*/, 0.000001f /*near plane*/);
+        glm::mat4 const ortho_matrix = glm::ortho(-2.0f, +2.0f, -1.5f, +1.5f, 0.1f, 100.0f);
+        glm::mat4 const view_projection_matrix =  ortho_matrix * view_matrix;
 
         // Clear previous frame buffers
         glClear(GL_COLOR_BUFFER_BIT);
