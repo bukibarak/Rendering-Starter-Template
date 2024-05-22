@@ -10,6 +10,10 @@ out vec4 out_color;
 
 void main()
 {
-    vec4 texture_color = texture(tex, uv);
-    out_color = texture_color;
+
+    vec2 damier = step(0.125, mod(uv, 0.25));
+
+    float col = abs(damier.x - damier.y);
+
+    out_color = vec4(col, col, col, 1.);
 }
