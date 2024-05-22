@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
 #include <opengl-framework/opengl-framework.hpp>
 
 void main() {
@@ -48,9 +49,27 @@ void main() {
     // Update function
     while (gl::window_is_open()) {
         glm::mat4 const view_matrix = camera.view_matrix();
-        // glm::mat4 const projection_matrix = glm::infinitePerspective(glm::radians(90.f), gl::framebuffer_aspect_ratio() /*aspect ratio*/, 0.000001f /*near plane*/);
-        glm::mat4 const ortho_matrix = glm::ortho(-2.0f, +2.0f, -1.5f, +1.5f, 0.1f, 100.0f);
-        glm::mat4 const view_projection_matrix =  ortho_matrix * view_matrix;
+
+        glm::mat4 const projection_matrix = glm::infinitePerspective(
+            glm::radians(90.f),
+            gl::framebuffer_aspect_ratio() /*aspect ratio*/,
+            0.000001f /*near plane*/
+        );
+        // glm::mat4 const ortho_matrix = glm::ortho(-2.0f, +2.0f, -1.5f, +1.5f, 0.1f, 100.0f);
+
+        glm::mat4 const translation_matrix = glm::translate(
+            glm::mat4{1.f},
+            glm::vec3{0.5f * sin(gl::time_in_seconds()), 0.f, -0.2f} /* déplacement */
+        );
+        glm::mat4 const rotation_matrix = glm::rotate(
+            glm::mat4{1.f},
+            gl::time_in_seconds() /*angle de la rotation*/,
+            glm::vec3{0.f, 0.f, 1.f} /* axe autour duquel on tourne */
+        );
+        glm::mat4 const model_matrix = translation_matrix * rotation_matrix;
+
+
+        glm::mat4 const view_projection_matrix =  model_matrix * projection_matrix * view_matrix;
 
         // Clear previous frame buffers
         glClear(GL_COLOR_BUFFER_BIT);
