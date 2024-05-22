@@ -58,6 +58,7 @@ int main()
 
         // Set vertex shader uniform variables
         rect_shader.set_uniform("aspect_ratio", gl::framebuffer_aspect_ratio());
+        rect_shader.set_uniform("time_sec", gl::time_in_seconds());
 
         // C'est ce qu'on appelle un "draw call" : on envoie l'instruction à la carte graphique de dessiner notre mesh.
         rectangle_mesh.draw();
