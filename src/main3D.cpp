@@ -69,7 +69,7 @@ void main() {
                 1, 5, 3,
                 5, 7, 3,
 
-                4, 5, 7,
+                4, 5, 1,
                 4, 1, 0,
 
                 6, 7, 3,
@@ -82,9 +82,13 @@ void main() {
         .fragment = gl::ShaderSource::File{"res/fragment3D.glsl"},
     }};
 
+    // Only draw CW triangle front face
     // glEnable(GL_CULL_FACE);
     // glCullFace(GL_FRONT);
     // glFrontFace(GL_CW);
+
+    // Enable depth buffer
+    glEnable(GL_DEPTH_TEST);
 
     // Update function
     while (gl::window_is_open()) {
@@ -113,13 +117,12 @@ void main() {
 
         glm::mat4 const view_projection_matrix =  projection_matrix * view_matrix * model_matrix;
 
-        // Clear previous frame buffers
-        glClear(GL_COLOR_BUFFER_BIT);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glClear(GL_STENCIL_BUFFER_BIT);
 
         // Choisis la couleur à utiliser. Les paramètres sont R, G, B, A avec des valeurs qui vont de 0 à 1
         glClearColor(0.f, 0.f, 1.f, 1.f);
+
+        // Clear previous frame buffers
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         screen_shader.bind();
         screen_shader.set_uniform("view_projection_matrix", view_projection_matrix);
