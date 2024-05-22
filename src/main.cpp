@@ -33,6 +33,11 @@ int main()
         }
     }};
 
+    auto const rect_shader = gl::Shader{{
+        .vertex   = gl::ShaderSource::File{"res/vertex.glsl"},
+        .fragment = gl::ShaderSource::File{"res/fragment.glsl"},
+    }};
+
     while (gl::window_is_open())
     {
         // Rendu à chaque frame
@@ -44,7 +49,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // On a besoin qu'un shader soit bind (i.e. "actif") avant de draw(). On en reparle dans la section d'après.
-        gl::bind_default_shader();
+        rect_shader.bind();
 
         // C'est ce qu'on appelle un "draw call" : on envoie l'instruction à la carte graphique de dessiner notre mesh.
         rectangle_mesh.draw();
