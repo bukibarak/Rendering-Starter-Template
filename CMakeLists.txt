@@ -29,3 +29,13 @@ target_compile_features(MainUV PRIVATE cxx_std_20)
 # Include lib
 target_link_libraries(MainUV PRIVATE opengl_framework::opengl_framework)
 gl_target_copy_folder(MainUV res)
+
+
+add_executable(MainOBJ src/MainOBJ.cpp)
+target_include_directories(MainOBJ PRIVATE src)
+target_compile_features(MainOBJ PRIVATE cxx_std_20)
+
+# Include lib
+target_link_libraries(MainOBJ PRIVATE opengl_framework::opengl_framework)
+gl_target_copy_folder(MainOBJ res)
+
