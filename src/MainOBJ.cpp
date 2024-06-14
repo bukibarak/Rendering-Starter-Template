@@ -7,6 +7,16 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <opengl-framework/opengl-framework.hpp>
 
+struct PointLight {
+
+    glm::vec3 Position;
+    float Intensity;
+
+    PointLight() : Position(0, 0, 0), Intensity(100.0f) {}
+    explicit PointLight(const glm::vec3& in_Position): Position(in_Position), Intensity(100.0f) {}
+    explicit PointLight(const glm::vec3& in_Position, const float &in_Intensity) : Position(in_Position), Intensity(in_Intensity) {}
+};
+
 int main() {
 
     // Window initialization
@@ -184,6 +194,9 @@ int main() {
     // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
 
+    PointLight point_light;
+    point_light.Intensity = 5000.0f;
+
     // Update function
     while (gl::window_is_open()) {
         glm::mat4 const view_matrix = camera.view_matrix();
@@ -216,11 +229,19 @@ int main() {
 
 
         render_target.render([&] {
+            point_light.Position = glm::vec3{cos(gl::time_in_seconds()), sin(gl::time_in_seconds()), 0.};
+            point_light.Position *= 100.0f;
+
+
             obj_shader.bind();
             obj_shader.set_uniform("view_projection_matrix", view_projection_matrix);
             obj_shader.set_uniform("tex", texture);
-            obj_shader.set_uniform("light", glm::normalize(glm::vec3{0.5, -1., -1.}));
-            obj_shader.set_uniform("illumination", 0.2f);
+            obj_shader.set_uniform("global_light", glm::normalize(glm::vec3{0.5, -1., -1.}));
+            obj_shader.set_uniform("global_light_intensity", 0.5f);
+            // obj_shader.set_uniform("global_light", glm::normalize(glm::vec3{0., 0., 0.}));
+            obj_shader.set_uniform("point_light", point_light.Position);
+            obj_shader.set_uniform("point_light_intensity", point_light.Intensity);
+            obj_shader.set_uniform("global_illumination", 0.15f);
 
             // Choisis la couleur à utiliser. Les paramètres sont R, G, B, A avec des valeurs qui vont de 0 à 1
             glClearColor(0.f, 0.f, 1.f, 1.f);
@@ -235,7 +256,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         screen_shader.bind();
-        screen_shader.set_uniform("tex", render_target.color_texture(0)); // TODO DEMANDER SI C'EST JUSTE
+        screen_shader.set_uniform("tex", render_target.color_texture(0));
         screen_mesh.draw();
 
     }
