@@ -50,10 +50,14 @@ int main() {
 
                 // Check if `normal_index` is zero or positive. negative = no normal data
                 if (idx.normal_index >= 0) {
-                    data.push_back(attrib.normals[3*int(idx.normal_index)+0]);                      // NORMAL X
-
-                    data.push_back(attrib.normals[3*int(idx.normal_index)+2]);                      // NORMAL Z
-                    data.push_back(attrib.normals[3*int(idx.normal_index)+1]);                      // NORMAL Y
+                    glm::vec3 normals_normalized = glm::normalize(glm::vec3{
+                        attrib.normals[3*int(idx.normal_index)+0],                                  // NORMAL X
+                        attrib.normals[3*int(idx.normal_index)+2],                                  // NORMAL Z
+                        attrib.normals[3*int(idx.normal_index)+2]                                   // NORMAL Y
+                    });
+                    data.push_back(normals_normalized.x);
+                    data.push_back(normals_normalized.y);
+                    data.push_back(normals_normalized.z);
                 }
 
                 // Check if `texcoord_index` is zero or positive. negative = no texcoord data
@@ -162,7 +166,7 @@ int main() {
     }};
 
 
-    auto const camera_shader = gl::Shader{{
+    auto const obj_shader = gl::Shader{{
         .vertex = gl::ShaderSource::File{"res/vertexOBJ.glsl"},
         .fragment = gl::ShaderSource::File{"res/fragmentOBJ.glsl"},
     }};
@@ -212,9 +216,11 @@ int main() {
 
 
         render_target.render([&] {
-            camera_shader.bind();
-            camera_shader.set_uniform("view_projection_matrix", view_projection_matrix);
-            camera_shader.set_uniform("tex", texture);
+            obj_shader.bind();
+            obj_shader.set_uniform("view_projection_matrix", view_projection_matrix);
+            obj_shader.set_uniform("tex", texture);
+            obj_shader.set_uniform("light", glm::normalize(glm::vec3{0.5, -1., -1.}));
+            obj_shader.set_uniform("illumination", 0.2f);
 
             // Choisis la couleur à utiliser. Les paramètres sont R, G, B, A avec des valeurs qui vont de 0 à 1
             glClearColor(0.f, 0.f, 1.f, 1.f);
