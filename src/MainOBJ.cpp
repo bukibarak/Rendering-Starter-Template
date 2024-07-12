@@ -101,6 +101,8 @@ int main() {
                     }}
             }};
 
+
+
     // Render target initialization
     auto render_target = gl::RenderTarget{gl::RenderTarget_Descriptor{
         .width          = gl::framebuffer_width_in_pixels(),
@@ -195,7 +197,7 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     PointLight point_light;
-    point_light.Intensity = 5000.0f;
+    point_light.Intensity = 10.0f;
 
     // Update function
     while (gl::window_is_open()) {
@@ -211,13 +213,13 @@ int main() {
         glm::mat4 const translation_matrix = glm::translate(
             glm::mat4{1.f},
             // glm::vec3{0.5f * sin(gl::time_in_seconds()), 0.f, -0.2f} /* déplacement */
-            glm::vec3{-2.f, 0.f, -1.f}
+            glm::vec3{0.f, 0.f, 0.f}
         );
         glm::mat4 const rotation_matrix = glm::rotate(
             glm::mat4{1.f},
-            // gl::time_in_seconds() /*angle de la rotation*/,
-            0.f,
-            glm::vec3{0.f, 0.f, 1.f} /* axe autour duquel on tourne */
+            gl::time_in_seconds() /*angle de la rotation*/,
+            // 0.f,
+            glm::vec3{1.f, 0.f, 0.f} /* axe autour duquel on tourne */
         );
         glm::mat4 const model_matrix = rotation_matrix * translation_matrix;
 
@@ -229,19 +231,21 @@ int main() {
 
 
         render_target.render([&] {
-            point_light.Position = glm::vec3{cos(gl::time_in_seconds()), sin(gl::time_in_seconds()), 0.};
-            point_light.Position *= 100.0f;
+            // point_light.Position = glm::vec3{cos(gl::time_in_seconds()), sin(gl::time_in_seconds()), 0.f};
+            point_light.Position = glm::vec3{1.0f, -2.5f, -0.25f};
+            // point_light.Position *= 1000.0f;
 
 
             obj_shader.bind();
             obj_shader.set_uniform("view_projection_matrix", view_projection_matrix);
+            obj_shader.set_uniform("model_matrix", model_matrix);
             obj_shader.set_uniform("tex", texture);
-            obj_shader.set_uniform("global_light", glm::normalize(glm::vec3{0.5, -1., -1.}));
-            obj_shader.set_uniform("global_light_intensity", 0.5f);
+            obj_shader.set_uniform("global_light_WS", glm::normalize(glm::vec3{0.5, -1., -1.}));
+            obj_shader.set_uniform("global_light_intensity", 0.3f);
             // obj_shader.set_uniform("global_light", glm::normalize(glm::vec3{0., 0., 0.}));
-            obj_shader.set_uniform("point_light", point_light.Position);
+            obj_shader.set_uniform("point_light_WS", point_light.Position);
             obj_shader.set_uniform("point_light_intensity", point_light.Intensity);
-            obj_shader.set_uniform("global_illumination", 0.15f);
+            obj_shader.set_uniform("global_illumination", 0.015f);
 
             // Choisis la couleur à utiliser. Les paramètres sont R, G, B, A avec des valeurs qui vont de 0 à 1
             glClearColor(0.f, 0.f, 1.f, 1.f);
