@@ -200,7 +200,7 @@ int main() {
 
     PointLight point_light{
         glm::vec3(0.f, 0.f, 0.f),
-        glm::vec3(1.f, 0.f, 0.f),
+        glm::vec3(155.0f / 255.0f, 31.0f / 255.0f,  232.0f / 255.0f),
         3.f
     };
 
@@ -222,8 +222,8 @@ int main() {
         );
         glm::mat4 const rotation_matrix = glm::rotate(
             glm::mat4{1.f},
-            // gl::time_in_seconds() /*angle de la rotation*/,
-            0.f,
+            gl::time_in_seconds() /*angle de la rotation*/,
+            // 0.f,
             glm::vec3{1.f, 0.f, 0.f} /* axe autour duquel on tourne */
         );
         glm::mat4 const model_matrix = rotation_matrix * translation_matrix;
@@ -236,8 +236,8 @@ int main() {
 
 
         render_target.render([&] {
-            // point_light.Position = glm::vec3{cos(gl::time_in_seconds()), sin(gl::time_in_seconds()), 0.f};
-            point_light.Position = glm::vec3{1.0f, -2.5f, -0.25f};
+            point_light.Position = glm::vec3{2.f * cos(gl::time_in_seconds()), 2.5f * sin(gl::time_in_seconds()), -0.25f};
+            // point_light.Position = glm::vec3{1.0f, -2.5f, -0.25f};
             // point_light.Position *= 1000.0f;
 
 
