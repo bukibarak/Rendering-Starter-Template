@@ -8,13 +8,15 @@
 #include <opengl-framework/opengl-framework.hpp>
 
 struct PointLight {
-
     glm::vec3 Position;
+    glm::vec3 Color;
     float Intensity;
 
-    PointLight() : Position(0, 0, 0), Intensity(100.0f) {}
-    explicit PointLight(const glm::vec3& in_Position): Position(in_Position), Intensity(100.0f) {}
-    explicit PointLight(const glm::vec3& in_Position, const float &in_Intensity) : Position(in_Position), Intensity(in_Intensity) {}
+    PointLight() : Position(0, 0, 0), Color(1.0f,1.0f,1.0f), Intensity(100.0f) {}
+    explicit PointLight(const glm::vec3& in_Position): Position(in_Position), Color(1.0f, 1.0f, 1.0f), Intensity(100.0f) {}
+    explicit PointLight(const glm::vec3& in_Position, const glm::vec3& in_Color): Position(in_Position), Color(in_Color), Intensity(100.0f) {}
+    explicit PointLight(const glm::vec3& in_Position, const float &in_Intensity) : Position(in_Position), Color(1.0f,1.0f,1.0f), Intensity(in_Intensity) {}
+    explicit PointLight(const glm::vec3& in_Position, const glm::vec3& in_Color, const float &in_Intensity): Position(in_Position), Color(in_Color), Intensity(in_Intensity) {}
 };
 
 int main() {
@@ -196,8 +198,11 @@ int main() {
     // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
 
-    PointLight point_light;
-    point_light.Intensity = 10.0f;
+    PointLight point_light{
+        glm::vec3(0.f, 0.f, 0.f),
+        glm::vec3(1.f, 0.f, 0.f),
+        3.f
+    };
 
     // Update function
     while (gl::window_is_open()) {
@@ -217,8 +222,8 @@ int main() {
         );
         glm::mat4 const rotation_matrix = glm::rotate(
             glm::mat4{1.f},
-            gl::time_in_seconds() /*angle de la rotation*/,
-            // 0.f,
+            // gl::time_in_seconds() /*angle de la rotation*/,
+            0.f,
             glm::vec3{1.f, 0.f, 0.f} /* axe autour duquel on tourne */
         );
         glm::mat4 const model_matrix = rotation_matrix * translation_matrix;
@@ -245,6 +250,7 @@ int main() {
             // obj_shader.set_uniform("global_light", glm::normalize(glm::vec3{0., 0., 0.}));
             obj_shader.set_uniform("point_light_WS", point_light.Position);
             obj_shader.set_uniform("point_light_intensity", point_light.Intensity);
+            obj_shader.set_uniform("point_light_color", point_light.Color);
             obj_shader.set_uniform("global_illumination", 0.015f);
 
             // Choisis la couleur à utiliser. Les paramètres sont R, G, B, A avec des valeurs qui vont de 0 à 1

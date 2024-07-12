@@ -4,6 +4,7 @@ uniform vec3 global_light_WS;
 uniform float global_light_intensity;
 uniform vec3 point_light_WS;
 uniform float point_light_intensity;
+uniform vec3 point_light_color;
 uniform float global_illumination;
 uniform sampler2D tex;
 
@@ -31,11 +32,15 @@ void main()
     float point_intensity = max(0, -dot(normalize(position_WS - point_light_WS), normalized_normal)) / pow(point_light_length, 2);
     point_intensity *= point_light_intensity;
 
-    float light_intensity = global_intensity + point_intensity;
-    float light_with_global_illumination = light_intensity + global_illumination;
+    vec3 point_color = point_light_color * point_intensity;
+    point_color += vec3(global_intensity + global_illumination);
+
+//    float light_intensity = global_intensity + point_intensity;
+//    float light_with_global_illumination = light_intensity + global_illumination;
 
     vec4 tex_color = texture(tex, uv);
-    vec4 tex_light_color =  vec4( vec3(tex_color) * light_with_global_illumination, 1.);
+    // vec4 tex_light_color =  vec4(dot(vec3(tex_color), point_color), 1.);
+    vec4 tex_light_color =  vec4(vec3(tex_color) + point_color, 1.);
 
     // out_color = (vec4(point_intensity, point_intensity, point_intensity, 1.));
     out_color = tex_light_color;
